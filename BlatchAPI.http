@@ -1,0 +1,6 @@
+@BlatchAPI_HostAddress = http://localhost:5231
+
+GET {{BlatchAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
