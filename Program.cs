@@ -18,17 +18,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-var service = new AzureBlobService();
-
-await service.ReadBlobAsync();
-
-app.MapGet("/users", async (AzureBlobService service) =>
-{
-    var json = await service.ReadBlobAsync();
-    //Parse JSON and return users
-
-    return new[] { new { Id = "1", FirstName = "John" } };
-});
 
 app.MapApiCalls();
 

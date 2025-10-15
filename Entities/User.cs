@@ -25,13 +25,13 @@ namespace BlatchAPI.Entities
         [JsonPropertyName("company")]
         public string? Company { get; set; }
         [JsonPropertyName("department")]
-        public string Department { get; set; }
+        public string? Department { get; set; }
         [JsonPropertyName("headshotImage")]
-        public Base64StringAttribute HeadshotImage { get; set; }
+        public string HeadshotImage { get; set; }
         [JsonPropertyName("longitude")]
-        public string? Longitude { get; set; }
+        public double? Longitude { get; set; }
         [JsonPropertyName("latitude")]
-        public string? Latitude { get; set; }
+        public double? Latitude { get; set; }
         [JsonPropertyName("skills")]
         public IEnumerable<string>? Skills { get; set; }
         [JsonPropertyName("colleagues")]

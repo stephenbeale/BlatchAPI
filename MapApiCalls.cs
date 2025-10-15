@@ -9,23 +9,24 @@ namespace BlatchAPI
     {
         public static IApplicationBuilder MapApiCalls(this WebApplication app)
         {
-            app.MapGet("/", GetBlobContainers);
+            app.MapGet("/users", GetUsers);
+            app.MapGet("/addresses", GetAddresses);
+
             return app;
         }
 
-        [Authorize]
-        public static async Task<IEnumerable<User>> GetBlobContainers(AzureBlobService azureBlobService)
+        public static async Task<IEnumerable<User>> GetUsers(AzureBlobService azureBlobService)
         {
-            // Simulate fetching users from a database or other source
-            await Task.Delay(100); // Simulate async work
+            var result = await azureBlobService.GetUsersAsync();
 
-            var blobClient = azureBlobService.ReadBlobAsync();
+            return result;
+        }
 
-            return new List<User>
-            {
-                new User { Id = "1", FirstName = "Alice" },
-                new User { Id = "2", FirstName = "Bob" }
-            };
+        public static async Task<IEnumerable<Address>> GetAddresses(AzureBlobService azureBlobService)
+        {
+            var result = await azureBlobService.GetAddressesAsync();
+
+            return result;
         }
     }
 }
