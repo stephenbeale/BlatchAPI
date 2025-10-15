@@ -17,9 +17,7 @@ namespace BlatchAPI
         {
             var response = await _blobClient.DownloadAsync();
 
-            Console.WriteLine(response.Value.Content.ToString());
-
-            return response.Value.Content.ToString();
+                        return response.Value.Content.ToString();
         }
     }
 }
