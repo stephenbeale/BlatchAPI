@@ -10,14 +10,14 @@ namespace BlatchAPI
         public AzureBlobService()
         {
             string sasUrl = "https://blatchfordinterview.blob.core.windows.net/source-data/contacts.json?sp=r&st=2025-10-13T10:26:21Z&se=2025-12-31T23:59:59Z&spr=https&sv=2024-11-04&sr=b&sig=IPcCEW7%2BDR2l809lKZxTfn93OWxiJEIJICFWIcs%2Bu3E%3D";
-            _blobClient = new BlobClient(new Uri(sasUrl));
+            _blobClient = new BlobClient(new Uri(sasUrl.TrimEnd()));
         }
 
         public async Task<string> ReadBlobAsync()
         {
             var response = await _blobClient.DownloadAsync();
 
-            Console.WriteLine(response.Value.ToString());
+            Console.WriteLine(response.Value.Content.ToString());
 
             return response.Value.Content.ToString();
         }
