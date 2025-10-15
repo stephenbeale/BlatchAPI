@@ -1,5 +1,6 @@
 ﻿using Azure.Storage;
 using Azure.Storage.Blobs;
+using BlatchAPI.Entities;
 
 namespace BlatchAPI
 {
@@ -13,13 +14,25 @@ namespace BlatchAPI
             _blobClient = new BlobClient(new Uri(sasUrl.TrimEnd()));
         }
 
-        public async Task<string> ReadBlobAsync()
+        public async Task<List<User>> GetUsersAsync()
         {
             var response = await _blobClient.DownloadAsync();
+            using var streamReader = new StreamReader(response.Value.Content);
+            string jsonContent = await streamReader.ReadToEndAsync();
+            var users = System.Text.Json.JsonSerializer.Deserialize<List<User>>(jsonContent);
 
-            Console.WriteLine(response.Value.Content.ToString());
+            return users ?? new List<User>();
+        }
 
-            return response.Value.Content.ToString();
+        public async Task<List<Address>> GetAddressesAsync()
+        {
+            var response = await GetUsersAsync();
+            if(response == null || !response.Any())
+            {
+                return new List<Address>();
+            }
+            var addresses = response.Select(u => u.Address).ToList();
+            return addresses ?? new List<Address>();
         }
     }
 }
