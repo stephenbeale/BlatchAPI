@@ -24,8 +24,13 @@ namespace BlatchAPI
             return users ?? new List<User>();
         }
 
-        public async Task<List<Address>> GetAddressesAsync()
+        public async Task<List<Address>> GetAddressesAsync(string userId)
         {
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("Invalid userId.", nameof(userId));
+            }
+
             var response = await GetUsersAsync();
             if(response == null || !response.Any())
             {
@@ -34,5 +39,40 @@ namespace BlatchAPI
             var addresses = response.Select(u => u.Address).ToList();
             return addresses ?? new List<Address>();
         }
+
+        //public async Task<List<string>> GetUserSkillsAsync(string userId)
+        //{
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        throw new ArgumentException("Invalid userId.", nameof(userId));
+        //    }
+
+        //    var response = await GetUsersAsync();
+        //    if(response == null || !response.Any())
+        //    {
+        //        return new List<string>();
+        //    }
+        //    var skills = response.Where(u => u.Id == userId).Select(u => u.Skills).FirstOrDefault();
+            
+        //    return skills ?? new List<string>();
+        //}
+        
+        //public async Task<List<string>> GetUserColleaguesAsync(string userId)
+        //{
+        //    if (string.IsNullOrEmpty(userId))
+        //    {
+        //        throw new ArgumentException("Invalid userId.", nameof(userId));
+        //    }
+
+        //    var response = await GetUsersAsync();
+            
+        //    if(response == null || !response.Any())
+        //    {
+        //        return new List<string>();
+        //    }
+
+        //    var colleagues = response.Select(u => u.Colleagues).ToList();
+        //    return colleagues ?? new List<string>();
+        //}
     }
 }

@@ -10,7 +10,8 @@ namespace BlatchAPI
         public static IApplicationBuilder MapApiCalls(this WebApplication app)
         {
             app.MapGet("/users", GetUsers);
-            app.MapGet("/addresses", GetAddresses);
+            //app.MapGet("/addresses/", GetAddresses);
+            //app.MapGet("/skills/{userId}", GetSkills);
 
             return app;
         }
@@ -22,11 +23,25 @@ namespace BlatchAPI
             return result;
         }
 
-        public static async Task<IEnumerable<Address>> GetAddresses(AzureBlobService azureBlobService)
-        {
-            var result = await azureBlobService.GetAddressesAsync();
+        //public static async Task<IEnumerable<Address>> GetAddresses(AzureBlobService azureBlobService, string userId)
+        //{
+        //    var result = await azureBlobService.GetAddressesAsync();
 
-            return result;
-        }
+        //    return result;
+        //}
+        
+        //public static async Task<IEnumerable<string>> GetSkills(AzureBlobService azureBlobService, string userId)
+        //{
+        //    var result = await azureBlobService.GetSkillsAsync(userId);
+
+        //    return result;
+        //}
+        
+        //public static async Task<IEnumerable<string>> GetColleagues(AzureBlobService azureBlobService, string userId)
+        //{
+        //    var result = await azureBlobService.GetColleaguesAsync(userId);
+
+        //    return result;
+        //}
     }
 }
