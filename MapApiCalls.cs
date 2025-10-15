@@ -1,25 +1,31 @@
-﻿using BlatchAPI.Entities;
+﻿using Azure.Storage.Blobs;
+using BlatchAPI.Entities;
+using Microsoft.AspNetCore.Authorization;
 using System.Runtime.CompilerServices;
 
 namespace BlatchAPI
 {
     public static class ApiCalls
     {
-        public static IApplicationBuilder MapApiCalls()
+        public static IApplicationBuilder MapApiCalls(this WebApplication app)
         {
-            app.MapGet("/users", GetUsers).WithName(nameof("GetUsers"));
+            app.MapGet("/", GetBlobContainers);
             return app;
         }
 
-        public static async Task<IEnumerable<User>> GetUsers()
+        [Authorize]
+        public static async Task<IEnumerable<User>> GetBlobContainers(AzureBlobService azureBlobService)
         {
             // Simulate fetching users from a database or other source
             await Task.Delay(100); // Simulate async work
+
+            var blobClient = azureBlobService.ReadBlobAsync();
+
             return new List<User>
-        {
-            new User { Id = 1, Name = "Alice" },
-            new User { Id = 2, Name = "Bob" }
-        };
+            {
+                new User { Id = "1", FirstName = "Alice" },
+                new User { Id = "2", FirstName = "Bob" }
+            };
         }
     }
 }

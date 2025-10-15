@@ -36,6 +36,10 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
+var service = new BlatchAPI.AzureBlobService();
+
+await service.ReadBlobAsync();
+
 app.Run();
 
 internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
