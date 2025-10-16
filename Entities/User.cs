@@ -33,9 +33,9 @@ namespace BlatchAPI.Entities
         [JsonPropertyName("latitude")]
         public double? Latitude { get; set; }
         [JsonPropertyName("skills")]
-        public IEnumerable<string>? Skills { get; set; }
+        public List<string>? Skills { get; set; }
         [JsonPropertyName("colleagues")]
-        public IEnumerable<string>? Colleagues { get; set; }
+        public List<string>? Colleagues { get; set; }
         [JsonPropertyName("employmentStart")]
         public DateTimeOffset? EmploymentStart { get; set; }
         [JsonPropertyName("employmentEnd")]
