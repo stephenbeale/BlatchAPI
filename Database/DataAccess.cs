@@ -33,9 +33,9 @@ namespace BlatchAPI.Database
                 {
                     continue;
                 }
-                
+
                 var result = await connection.ExecuteScalarAsync<Guid>(query,
-                    new 
+                    new
                     {
                         user.Address.StreetNumber,
                         user.Address.StreetName,
@@ -64,33 +64,52 @@ namespace BlatchAPI.Database
         public async Task<IEnumerable<User>> GetAllUsers()
         {
             string query = @"SELECT u.*, a.* 
-                     FROM Users u
-                     LEFT JOIN Addresses a ON u.AddressID = a.ID";
+             FROM Users u
+             LEFT JOIN Addresses a ON u.AddressID = a.ID";
 
             using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            var users = await connection.QueryAsync<User, Address, User>(
-                query,
-                (user, address) => {
-                    user.Address = address;
-                    return user;
-                },
-                splitOn: "ID");
 
-            foreach (var user in users)
+            var userDbHelpers = await connection.QueryAsync<UserDbHelper, Address, UserDbHelper>(
+                query,
+                (userDb, address) => {
+                    userDb.Address = address;
+                    return userDb;
+                },
+                splitOn: "ID"
+            );
+
+            var users = userDbHelpers.Select(userDb => new User
             {
-                user.Skills = user.Skills != null
-                    ? JsonSerializer.Deserialize<List<string>>(user.Skills)
-                    : null;
-                user.Colleagues = user.Colleagues != null
-                    ? JsonSerializer.Deserialize<List<string>>(user.Colleagues)
-                    : null;
-            }
+                ID = userDb.ID,
+                FirstName = userDb.FirstName,
+                LastName = userDb.LastName,
+                Email = userDb.Email,
+                Phone = userDb.Phone,
+                Age = userDb.Age,
+                Gender = userDb.Gender,
+                Company = userDb.Company,
+                Department = userDb.Department,
+                HeadshotImage = userDb.HeadshotImage,
+                Longitude = userDb.Longitude,
+                Latitude = userDb.Latitude,
+                EmploymentStart = userDb.EmploymentStart,
+                EmploymentEnd = userDb.EmploymentEnd,
+                FullName = userDb.FullName,
+                Address = userDb.Address,
+                Skills = string.IsNullOrEmpty(userDb.Skills)
+        ? null
+        : JsonSerializer.Deserialize<List<string>>(userDb.Skills),
+                Colleagues = string.IsNullOrEmpty(userDb.Colleagues)
+        ? null
+        : JsonSerializer.Deserialize<List<string>>(userDb.Colleagues)
+            });
+
             return users;
         }
 
         public async Task DeleteAllUsers()
         {
-            string deleteUsersQuery = "DELETE FROM Users";         
+            string deleteUsersQuery = "DELETE FROM Users";
             using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
             await connection.ExecuteAsync(deleteUsersQuery);
         }
@@ -129,7 +148,7 @@ namespace BlatchAPI.Database
                         user.Gender,
                         user.Company,
                         user.Department,
-                        user.HeadshotImage,                        
+                        user.HeadshotImage,
                         user.Longitude,
                         user.Latitude,
                         Skills = user.Skills == null ? null : JsonSerializer.Serialize(user.Skills),
@@ -139,6 +158,28 @@ namespace BlatchAPI.Database
                         user.FullName
                     });
             }
+        }
+
+        private class UserDbHelper
+        {
+            public Guid ID { get; set; }
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Email { get; set; }
+            public string Phone { get; set; }
+            public Address Address { get; set; }
+            public int? Age { get; set; }
+            public string Gender { get; set; }
+            public string Company { get; set; }
+            public string Department { get; set; }
+            public string HeadshotImage { get; set; }
+            public double? Longitude { get; set; }
+            public double? Latitude { get; set; }
+            public string Skills { get; set; }  // String from DB
+            public string Colleagues { get; set; }  // String from DB
+            public DateTimeOffset? EmploymentStart { get; set; }
+            public DateTimeOffset? EmploymentEnd { get; set; }
+            public string FullName { get; set; }
         }
     }
 }
