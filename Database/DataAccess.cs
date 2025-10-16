@@ -3,6 +3,7 @@ using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Reflection;
+using System.Text.Json;
 
 namespace BlatchAPI.Database
 {
@@ -74,18 +75,42 @@ namespace BlatchAPI.Database
                     return user;
                 },
                 splitOn: "ID");
+
+            foreach (var user in users)
+            {
+                user.Skills = user.Skills != null
+                    ? JsonSerializer.Deserialize<List<string>>(user.Skills)
+                    : null;
+                user.Colleagues = user.Colleagues != null
+                    ? JsonSerializer.Deserialize<List<string>>(user.Colleagues)
+                    : null;
+            }
             return users;
+        }
+
+        public async Task DeleteAllUsers()
+        {
+            string deleteUsersQuery = "DELETE FROM Users";         
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            await connection.ExecuteAsync(deleteUsersQuery);
+        }
+
+        public async Task DeleteAllAddresses()
+        {
+            string deleteAddressesQuery = "DELETE FROM Addresses";
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            await connection.ExecuteAsync(deleteAddressesQuery);
         }
 
         public async Task CreateUsers(List<User> users)
         {
             string query = @"INSERT INTO Users 
                             (
-                                [FirstName], [LastName], [Email], [Phone], [AddressID], [Age], [Gender], [Company], [Department], [HeadshotImage], [Longitude], [Latitude], [EmploymentStart], [EmploymentEnd], [FullName]
+                                [FirstName], [LastName], [Email], [Phone], [AddressID], [Age], [Gender], [Company], [Department], [HeadshotImage], [Longitude], [Latitude], [Skills], [Colleagues], [EmploymentStart], [EmploymentEnd], [FullName]
                             ) 
                             VALUES
                             (
-                                @FirstName, @LastName, @Email, @Phone, @AddressID, @Age, @Gender, @Company, @Department, @HeadshotImage, @Longitude, @Latitude, @EmploymentStart, @EmploymentEnd, @FullName 
+                                @FirstName, @LastName, @Email, @Phone, @AddressID, @Age, @Gender, @Company, @Department, @HeadshotImage, @Longitude, @Latitude, @Skills, @Colleagues, @EmploymentStart, @EmploymentEnd, @FullName 
                             )";
 
             using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
@@ -104,9 +129,11 @@ namespace BlatchAPI.Database
                         user.Gender,
                         user.Company,
                         user.Department,
-                        user.HeadshotImage,
+                        user.HeadshotImage,                        
                         user.Longitude,
                         user.Latitude,
+                        Skills = user.Skills == null ? null : JsonSerializer.Serialize(user.Skills),
+                        Colleagues = user.Colleagues == null ? null : JsonSerializer.Serialize(user.Colleagues),
                         user.EmploymentStart,
                         user.EmploymentEnd,
                         user.FullName
