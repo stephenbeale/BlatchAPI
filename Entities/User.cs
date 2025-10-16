@@ -7,7 +7,7 @@ namespace BlatchAPI.Entities
     public class User
     {
         [JsonPropertyName("id")]
-        public string Id { get; set; }
+        public Guid? ID { get; set; }
         [JsonPropertyName("firstName")]
         public string? FirstName { get; set; }
         [JsonPropertyName("lastName")]
@@ -17,7 +17,7 @@ namespace BlatchAPI.Entities
         [JsonPropertyName("phone")]
         public string? Phone { get; set; }
         [JsonPropertyName("address")]
-        public Address Address { get; set; }
+        public Address? Address { get; set; }
         [JsonPropertyName("age")]
         public int? Age { get; set; }
         [JsonPropertyName("gender")]
@@ -27,7 +27,7 @@ namespace BlatchAPI.Entities
         [JsonPropertyName("department")]
         public string? Department { get; set; }
         [JsonPropertyName("headshotImage")]
-        public string HeadshotImage { get; set; }
+        public string? HeadshotImage { get; set; }
         [JsonPropertyName("longitude")]
         public double? Longitude { get; set; }
         [JsonPropertyName("latitude")]

@@ -16,55 +16,90 @@ namespace BlatchAPI.Database
             var connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task CreateUserAddresses(List<Address> addresses)
+        public async Task CreateUserAddresses(List<User> users)
         {
             string query = @"
                             INSERT INTO Addresses ([StreetNumber], [StreetName], [City], [StateOrCounty], [PostalCode], [Country])
                             OUTPUT INSERTED.ID
-                            VALUES (@StreetNumber, @StreetName, @City, @StateOrCounty, @PostalCode, @Country)
-                            )";
-
-            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-
-            foreach (Address address in addresses)
-            {
-                await connection.ExecuteScalarAsync<Guid>(query,
-                    new 
-                    {
-                        address.StreetNumber,
-                        address.StreetName,
-                        address.City,
-                        address.StateOrCounty,
-                        address.PostalCode,
-                        address.Country
-                    });
-            }
-        }
-
-        public async Task CreateUsers(List<User> users)
-        {
-            string query = @"INSERT INTO Users 
-                            (
-                            [ID], [FirstName], [LastName], [Email], [Phone], [Address], [Age], [Gender], [Company], [Department], [HeadshotImage], [Longitude], [Latitude], [EmploymentStart], [EmploymentEnd], [FullName],
-                            ) 
-                            VALUES
-                            (
-                            @ID, @FirstName, @LastName, @Email, @Phone, @Address, @Age, @Gender, @Company, @Department, @HeadshotImage, @Longitude, @Latitude, @EmploymentStart, @EmploymentEnd, @FullName, 
+                            VALUES (@StreetNumber, @StreetName, @City, @StateOrCounty, @PostalCode, @Country
                             )";
 
             using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
             foreach (User user in users)
             {
-                await connection.ExecuteScalarAsync<Guid>(query,
+                if(user.Address == null)
+                {
+                    continue;
+                }
+                
+                var result = await connection.ExecuteScalarAsync<Guid>(query,
+                    new 
+                    {
+                        user.Address.StreetNumber,
+                        user.Address.StreetName,
+                        user.Address.City,
+                        user.Address.StateOrCounty,
+                        user.Address.PostalCode,
+                        user.Address.Country
+                    }
+                );
+
+                user.Address.ID = result;
+            }
+        }
+
+        public async Task<IEnumerable<Address>> GetAddresses()
+        {
+            string query = @"SELECT * FROM Addresses";
+
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
+            IEnumerable<Address> addresses = await connection.QueryAsync<Address>(query);
+
+            return addresses;
+        }
+
+        public async Task<IEnumerable<User>> GetAllUsers()
+        {
+            string query = @"SELECT u.*, a.* 
+                     FROM Users u
+                     LEFT JOIN Addresses a ON u.AddressID = a.ID";
+
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+            var users = await connection.QueryAsync<User, Address, User>(
+                query,
+                (user, address) => {
+                    user.Address = address;
+                    return user;
+                },
+                splitOn: "ID");
+            return users;
+        }
+
+        public async Task CreateUsers(List<User> users)
+        {
+            string query = @"INSERT INTO Users 
+                            (
+                                [FirstName], [LastName], [Email], [Phone], [AddressID], [Age], [Gender], [Company], [Department], [HeadshotImage], [Longitude], [Latitude], [EmploymentStart], [EmploymentEnd], [FullName]
+                            ) 
+                            VALUES
+                            (
+                                @FirstName, @LastName, @Email, @Phone, @AddressID, @Age, @Gender, @Company, @Department, @HeadshotImage, @Longitude, @Latitude, @EmploymentStart, @EmploymentEnd, @FullName 
+                            )";
+
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
+            foreach (User user in users)
+            {
+                await connection.ExecuteAsync(query,
                     new
                     {
-                        user.Id,
                         user.FirstName,
                         user.LastName,
                         user.Email,
                         user.Phone,
-                        user.Address,
+                        AddressId = user.Address?.ID,
                         user.Age,
                         user.Gender,
                         user.Company,
