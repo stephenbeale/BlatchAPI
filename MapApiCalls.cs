@@ -1,6 +1,8 @@
 ﻿using Azure.Storage.Blobs;
+using BlatchAPI.Database;
 using BlatchAPI.Entities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using System.Runtime.CompilerServices;
 
 namespace BlatchAPI
@@ -13,6 +15,8 @@ namespace BlatchAPI
             //app.MapGet("/addresses/", GetAddresses);
             //app.MapGet("/skills/{userId}", GetSkills);
 
+            app.MapPost("/users", CreateUsers);
+
             return app;
         }
 
@@ -23,20 +27,27 @@ namespace BlatchAPI
             return result;
         }
 
+        public static async Task<Ok<string>> CreateUsers(AzureBlobService azureBlobService, IDataAccess dataAccess)
+        {
+            var users = await azureBlobService.GetUsersAsync();
+            await dataAccess.CreateUsers(users);
+            return TypedResults.Ok("Users created");
+        }
+
         //public static async Task<IEnumerable<Address>> GetAddresses(AzureBlobService azureBlobService, string userId)
         //{
         //    var result = await azureBlobService.GetAddressesAsync();
 
         //    return result;
         //}
-        
+
         //public static async Task<IEnumerable<string>> GetSkills(AzureBlobService azureBlobService, string userId)
         //{
         //    var result = await azureBlobService.GetSkillsAsync(userId);
 
         //    return result;
         //}
-        
+
         //public static async Task<IEnumerable<string>> GetColleagues(AzureBlobService azureBlobService, string userId)
         //{
         //    var result = await azureBlobService.GetColleaguesAsync(userId);

@@ -1,10 +1,12 @@
-﻿using Dapper;
+﻿using BlatchAPI.Entities;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
+using System.Reflection;
 
 namespace BlatchAPI.Database
 {
-    public class DataAccess
+    public class DataAccess : IDataAccess
     {
         private readonly IConfiguration _configuration;
 
@@ -14,18 +16,67 @@ namespace BlatchAPI.Database
             var connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
-        public async Task InsertUsers()
+        public async Task CreateUserAddresses(List<Address> addresses)
         {
-            AzureBlobService azureBlobService = new AzureBlobService();
+            string query = @"
+                            INSERT INTO Addresses ([StreetNumber], [StreetName], [City], [StateOrCounty], [PostalCode], [Country])
+                            OUTPUT INSERTED.ID
+                            VALUES (@StreetNumber, @StreetName, @City, @StateOrCounty, @PostalCode, @Country)
+                            )";
 
-            var users = await azureBlobService.GetUsersAsync();
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
 
-            //Insert statement dapper
-            //How to handle addresses, skills, colleagues?
+            foreach (Address address in addresses)
+            {
+                await connection.ExecuteScalarAsync<Guid>(query,
+                    new 
+                    {
+                        address.StreetNumber,
+                        address.StreetName,
+                        address.City,
+                        address.StateOrCounty,
+                        address.PostalCode,
+                        address.Country
+                    });
+            }
+        }
 
-            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("Default"));
+        public async Task CreateUsers(List<User> users)
+        {
+            string query = @"INSERT INTO Users 
+                            (
+                            [ID], [FirstName], [LastName], [Email], [Phone], [Address], [Age], [Gender], [Company], [Department], [HeadshotImage], [Longitude], [Latitude], [EmploymentStart], [EmploymentEnd], [FullName],
+                            ) 
+                            VALUES
+                            (
+                            @ID, @FirstName, @LastName, @Email, @Phone, @Address, @Age, @Gender, @Company, @Department, @HeadshotImage, @Longitude, @Latitude, @EmploymentStart, @EmploymentEnd, @FullName, 
+                            )";
 
-            await connection.ExecuteAsync(users);
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
+            foreach (User user in users)
+            {
+                await connection.ExecuteScalarAsync<Guid>(query,
+                    new
+                    {
+                        user.Id,
+                        user.FirstName,
+                        user.LastName,
+                        user.Email,
+                        user.Phone,
+                        user.Address,
+                        user.Age,
+                        user.Gender,
+                        user.Company,
+                        user.Department,
+                        user.HeadshotImage,
+                        user.Longitude,
+                        user.Latitude,
+                        user.EmploymentStart,
+                        user.EmploymentEnd,
+                        user.FullName
+                    });
+            }
         }
     }
 }
