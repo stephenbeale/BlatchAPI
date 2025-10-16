@@ -12,10 +12,9 @@ namespace BlatchAPI
         public static IApplicationBuilder MapApiCalls(this WebApplication app)
         {
             app.MapGet("/users", GetUsers);
-            //app.MapGet("/addresses/", GetAddresses);
-            //app.MapGet("/skills/{userId}", GetSkills);
-
             app.MapPost("/users", CreateUsers);
+            app.MapPut("/users/{id}", UpdateUserById);
+            app.MapDelete("/users/{id}", DeleteUserById);
 
             return app;
         }
@@ -32,6 +31,23 @@ namespace BlatchAPI
             var users = await azureBlobService.GetUsersAsync();
             await dataAccess.CreateUsers(users);
             return TypedResults.Ok("Users created");
+        }
+
+        public static async Task<Ok<string>> UpdateUserById(AzureBlobService azureBlobService, IDataAccess dataAccess, Guid userId)
+        {
+            var users = await azureBlobService.GetUsersAsync();
+            await dataAccess.UpdateUserById(userId);
+            return TypedResults.Ok("Users updated");
+        }
+
+        private static async Task DeleteUserById(Guid userId)
+        {
+            throw new NotImplementedException();
+        }
+
+        private static async Task UpdateUsers(HttpContext context)
+        {
+            throw new NotImplementedException();
         }
 
         //public static async Task<IEnumerable<Address>> GetAddresses(AzureBlobService azureBlobService, string userId)
