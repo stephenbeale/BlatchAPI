@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlatchAPI", "BlatchAPI.cspr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlatchWASM", "..\BlatchWASM\BlatchWASM.csproj", "{CC505C29-773D-9ED8-B85F-3C4095AF19EB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlatchTests", "..\BlatchTests\BlatchTests.csproj", "{B5F9DF23-D9CA-443A-BCAF-1E5D5A10AC88}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{CC505C29-773D-9ED8-B85F-3C4095AF19EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC505C29-773D-9ED8-B85F-3C4095AF19EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC505C29-773D-9ED8-B85F-3C4095AF19EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5F9DF23-D9CA-443A-BCAF-1E5D5A10AC88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5F9DF23-D9CA-443A-BCAF-1E5D5A10AC88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5F9DF23-D9CA-443A-BCAF-1E5D5A10AC88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5F9DF23-D9CA-443A-BCAF-1E5D5A10AC88}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

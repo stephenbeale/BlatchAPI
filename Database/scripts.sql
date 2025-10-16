@@ -75,3 +75,7 @@ CREATE TABLE Colleagues (
     CONSTRAINT CHK_Colleagues_Different CHECK ([UserID] != [ColleagueID])
 )
 GO
+
+
+ALTER TABLE [dbo].[Users] ADD DEFAULT (newid()) FOR [ID]
+GO

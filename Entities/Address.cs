@@ -4,6 +4,7 @@ namespace BlatchAPI.Entities
 {
     public class Address
     {
+        public Guid ID { get; set; }
         [JsonPropertyName("streetNumber")]
         public string StreetNumber { get; set; }
         [JsonPropertyName("streetName")]
