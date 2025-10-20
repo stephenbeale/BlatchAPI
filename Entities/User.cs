@@ -7,7 +7,7 @@ namespace BlatchAPI.Entities
     public class User
     {
         [JsonPropertyName("id")]
-        public Guid? ID { get; set; }
+        public Guid ID { get; set; }
         [JsonPropertyName("firstName")]
         public string? FirstName { get; set; }
         [JsonPropertyName("lastName")]

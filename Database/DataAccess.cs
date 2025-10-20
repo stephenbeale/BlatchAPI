@@ -107,6 +107,54 @@ namespace BlatchAPI.Database
             return users;
         }
 
+        public async Task<User> GetUserById(Guid userId)
+        {
+            string query = @"SELECT u.*, a.* 
+             FROM Users u                
+             LEFT JOIN Addresses a ON u.AddressID = a.ID
+            WHERE u.ID = @userId";
+
+            using IDbConnection connection = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
+
+            var userDbHelpers = await connection.QueryAsync<UserDbHelper, Address, UserDbHelper>(
+                query,
+                (userDb, address) => {
+                    userDb.Address = address;
+                    return userDb;
+                },
+                new { userId },
+                splitOn: "ID"
+            );
+
+            var users = userDbHelpers.Select(userDb => new User
+            {
+                ID = userDb.ID,
+                FirstName = userDb.FirstName,
+                LastName = userDb.LastName,
+                Email = userDb.Email,
+                Phone = userDb.Phone,
+                Age = userDb.Age,
+                Gender = userDb.Gender,
+                Company = userDb.Company,
+                Department = userDb.Department,
+                HeadshotImage = userDb.HeadshotImage,
+                Longitude = userDb.Longitude,
+                Latitude = userDb.Latitude,
+                EmploymentStart = userDb.EmploymentStart,
+                EmploymentEnd = userDb.EmploymentEnd,
+                FullName = userDb.FullName,
+                Address = userDb.Address,
+                Skills = string.IsNullOrEmpty(userDb.Skills)
+        ? null
+        : JsonSerializer.Deserialize<List<string>>(userDb.Skills),
+                Colleagues = string.IsNullOrEmpty(userDb.Colleagues)
+        ? null
+        : JsonSerializer.Deserialize<List<string>>(userDb.Colleagues)
+            });
+
+            return users.SingleOrDefault();
+        }
+
         public async Task DeleteAllUsers()
         {
             string deleteUsersQuery = "DELETE FROM Users";
@@ -139,6 +187,7 @@ namespace BlatchAPI.Database
                 await connection.ExecuteAsync(query,
                     new
                     {
+                        Id = user.ID,
                         user.FirstName,
                         user.LastName,
                         user.Email,
@@ -158,6 +207,11 @@ namespace BlatchAPI.Database
                         user.FullName
                     });
             }
+        }
+
+        public Task UpdateUserById(Guid userId)
+        {
+            throw new NotImplementedException();
         }
 
         private class UserDbHelper
